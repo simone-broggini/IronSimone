@@ -49,22 +49,40 @@ SELECT account_id, sum(amount) FROM bank.loan group by account_id order by sum(a
 SELECT `date`, count(loan_id) from bank.loan where `date`<930907 group by `date` order by `date` desc;
 
 #Query 17: In the loan table, for each day in December 1997, count the number of loans issued for each unique loan duration, ordered by date and duration, both in ascending order. You can ignore days without any loans in your output.
-select `date`, duration, count(`date`) from bank.loan where `date` LIKE '9712%' group by `date`, duration order by `date`, duration;
+select distinct duration,`date`, count(loan_id) 
+from bank.loan 
+where `date` LIKE '9712%' 
+group by `date`, duration 
+order by `date`, duration;
 
 #Query 18: In the trans table, for account_id 396, sum the amount of transactions for each type (VYDAJ = Outgoing, PRIJEM = Incoming). Your output should have the account_id, the type and the sum of amount, named as total_amount. Sort alphabetically by type.
-select account_id, type, sum(amount) as total_amount from bank.trans where account_id=396 group by type order by type;
+select account_id, type, sum(amount) as total_amount 
+from bank.trans 
+where account_id=396 
+group by type 
+order by type;
 
 #Query 19: From the previous output, translate the values for type to English, rename the column to transaction_type, round total_amount down to an integer
-select account_id, case when type='PRIJEM' then 'INCOMING' else 'OUTGOING' end as transaction_type, floor(sum(amount)) as total_amount from bank.trans where account_id=396 group by type order by type;
+select account_id, 
+case when type='PRIJEM' then 'INCOMING' else 'OUTGOING' end as transaction_type, 
+floor(sum(amount)) as total_amount 
+from bank.trans 
+where account_id=396 
+group by type 
+order by type;
 
 #Query 20: From the previous result, modify your query so that it returns only one row, with a column for incoming amount, outgoing amount and the difference.
 select account_id, 
-sum(case when type='PRIJEM' then amount else 0 end) as incoming_amount, 
+sum(case when type='PRIJEM' then amount else 0 end) as incoming_amount,  
 sum(case when type='VYDAJ' then amount else 0 end) as outgoing_amount, 
 sum(case when type='PRIJEM' then amount when type='VYDAJ' then -amount end) as difference 
-from bank.trans where account_id=396;
+from bank.trans 
+where account_id=396;
 
 #Query 21: Continuing with the previous example, rank the top 10 account_ids based on their difference.
 select account_id, 
 floor(sum(case when type='PRIJEM' then amount when type='VYDAJ' then -amount end)) as difference 
-from bank.trans group by account_id order by difference desc limit 10;
+from bank.trans 
+group by account_id 
+order by difference desc 
+limit 10;
